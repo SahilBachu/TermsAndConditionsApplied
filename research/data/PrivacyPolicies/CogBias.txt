@@ -1,0 +1,27 @@
+Privacy Policy
+CogBias AI (“we”, “our”, “us”) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and protect your personal data.
+
+1 Information We Collect
+Account Information: Name, email address, login method (via Google/Firebase).
+Usage Data: How you interact with the platform (e.g., features used, rephrasing frequency).
+Text Inputs: Texts you submit for bias detection are processed but not stored unless explicitly saved by you.
+Payment Data: Handled securely via Stripe. We do not store your full payment details.
+
+2 How We Use Your Data
+To provide and improve the CogBias AI service.
+To analyze trends and user behavior (in aggregate).
+To send occasional updates, with your consent.
+
+3 Data Sharing
+We do not sell your data. We may share anonymized data with research partners or for product development.
+Legal requirements: We may disclose personal data if required by law or to protect our rights.
+
+4 Your Rights
+You can request deletion of your data at any time. You may opt out of marketing communications. You can access and update your information from your account dashboard.
+
+5 Data Retention
+We retain minimal personal data for as long as necessary to provide the service or comply with legal obligations.
+
+6 Contact Us
+If you have any questions, please contact us at:
+anatolyshillman@cogbias.ai
