@@ -121,3 +121,5 @@ You will receive:
 - The user's new question
 
 Always base your answers on the actual policy text provided. Do not invent clauses or terms that are not in the policy.`;
+
+module.exports = { ANALYZE_SYSTEM_PROMPT, CHAT_SYSTEM_PROMPT };
