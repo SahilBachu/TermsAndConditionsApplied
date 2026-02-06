@@ -1,5 +1,7 @@
 node_modules/
 .env
+app/backend/.env
+app/frontend/tc-applied/.env
 .venv/
 dist/
 *.local
