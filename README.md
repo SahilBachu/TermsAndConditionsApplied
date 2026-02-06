@@ -1,5 +1,9 @@
 # TermsAndConditionsApplied
 
+**Live Demo**: https://tc-applied.onrender.com/
+
+**Research Paper**: [The Transparency Gap: Quantifying Cognitive Load in User Agreements vs. Marketing Material](https://docs.google.com/document/d/1GWxOyPhcyHWUIrFQdYf49-mufRJIneKFz6v4P_48klA/edit?usp=sharing)
+
 A semantic privacy policy simplifier that reduces the cognitive load of legal text using LLM-powered ontology-based extraction. Built on the methodology of Kaur et al. (2022), this tool maps privacy policy clauses to semantic nodes (Data Collection, Third-Party Sharing, Data Retention, User Rights, Security) and rewrites them at a Flesch-Kincaid Grade Level of 8 or lower.
 
 ## Research Background
