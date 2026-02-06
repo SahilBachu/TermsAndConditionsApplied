@@ -14,3 +14,5 @@ async function chat(messages, options = {}) {
   });
   return response.choices[0].message.content;
 }
+
+module.exports = { chat };
