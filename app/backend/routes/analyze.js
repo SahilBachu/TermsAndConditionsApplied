@@ -55,6 +55,11 @@ router.post("/analyze", async (req, res) => {
     rawResponse = rawResponse.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
     let data = JSON.parse(rawResponse);
 
+    // If the LLM flagged this as not a real policy, tell the user
+    if (data.error === "NOT_A_POLICY") {
+      return res.status(400).json({ error: data.message });
+    }
+
     // Check if the simplified text is actually simple enough
     const allText = data.fullSimplifiedText.join(" ");
     let fkGrade = getFleschKincaidGrade(allText);

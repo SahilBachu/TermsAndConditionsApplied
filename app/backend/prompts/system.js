@@ -89,6 +89,14 @@ Use one of these Google Material Icons names based on the bias type:
 - "medium" — Potentially unfair: broad licensing, vague collection terms, long retention
 - "low" — Minor concern: standard practices with slight imbalance
 
+## Input Validation
+
+Before processing, check if the provided text is actually a privacy policy, terms of service, user agreement, or similar legal/policy document. If the text is clearly NOT a policy (e.g., a URL, a random sentence, marketing copy, a news article, code, a recipe, song lyrics, or any other non-policy content), you MUST respond with ONLY this exact JSON and nothing else:
+
+{"error": "NOT_A_POLICY", "message": "The text you pasted does not appear to be a privacy policy or terms of service. Please paste the actual policy text."}
+
+Do NOT fabricate or invent policy content. Do NOT try to analyze non-policy text. Only proceed with the analysis if the text is genuinely a privacy policy, terms of service, or legal agreement.
+
 ## Critical Rules
 
 - Write ALL simplified text at a Flesch-Kincaid Grade Level of 8 or lower.
