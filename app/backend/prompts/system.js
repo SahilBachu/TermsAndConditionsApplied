@@ -1,3 +1,8 @@
+// System prompts for the LLM
+// These define how the AI should behave for analysis vs chat mode
+
+// The big analysis prompt - based on the Kaur et al. (2022) methodology
+// It tells the LLM to map policy clauses to semantic nodes and simplify everything
 const ANALYZE_SYSTEM_PROMPT = `You are a Semantic Privacy Analysis Engine operating on the methodology of Kaur et al. (2022). Your goal is to reduce cognitive load by performing Ontology-Based Extraction on privacy policies.
 
 ## Domain Ontology
@@ -91,6 +96,8 @@ Use one of these Google Material Icons names based on the bias type:
 - Avoid legal jargon entirely.
 - Return ONLY the JSON object. Nothing else.`;
 
+// The chat prompt - much simpler, just tells the AI to answer questions casually
+// The semantic nodes are there so it can internally figure out what part of the policy to reference
 const CHAT_SYSTEM_PROMPT = `You are a helpful privacy policy assistant. You answer questions about privacy policies in plain, simple English.
 
 ## How to answer

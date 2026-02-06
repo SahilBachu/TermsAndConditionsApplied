@@ -1,8 +1,14 @@
+// Type definitions and mock data
+// The types are used throughout the app, the mock data is used for initial/default states
+
+// Each simplified section maps to one of the semantic nodes from the Kaur et al. methodology
 export interface SimplifiedSection {
   title: string;
   content: string;
 }
 
+// Bias represents an unfair or one-sided clause found in the policy
+// The style fields are Tailwind classes sent from the backend based on severity
 export interface Bias {
   id: string;
   icon: string;
@@ -14,12 +20,15 @@ export interface Bias {
   iconColor: string;
 }
 
+// Chat message format for the AI chat interface
 export interface ChatMessage {
   id: string;
   role: "assistant" | "user";
   content: string;
   timestamp: string;
 }
+
+// Mock data below - used for development/testing and as initial chat state
 
 export const mockSimplifiedSections: SimplifiedSection[] = [
   {
@@ -97,6 +106,7 @@ export const mockChatBiases: Bias[] = [
   },
 ];
 
+// Initial greeting message shown when the chat opens
 export const mockInitialChatMessage: ChatMessage = {
   id: "msg-1",
   role: "assistant",
@@ -105,6 +115,7 @@ export const mockInitialChatMessage: ChatMessage = {
   timestamp: "Today, 10:23 AM",
 };
 
+// Suggested questions shown below the initial chat message
 export const mockSuggestedQuestions = [
   { label: "Question 1", detail: "What is exclusionary framing?" },
   { label: "Question 2", detail: "Show me the original text?" },

@@ -1,3 +1,5 @@
+// Navbar - top navigation bar with the logo and dark mode toggle
+// Clicking the logo takes you back to the input page
 import { useNavigate } from "react-router-dom";
 import DarkModeToggle from "./DarkModeToggle";
 

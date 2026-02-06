@@ -1,3 +1,5 @@
+// Chat route - lets users ask follow-up questions about the policy
+// Uses conversation history so the AI remembers context
 const express = require("express");
 const router = express.Router();
 
@@ -16,6 +18,7 @@ router.post("/chat", async (req, res) => {
       return res.status(400).json({ error: "Policy text is required for context." });
     }
 
+    // Build the messages array with the system prompt + the policy as context
     const messages = [
       { role: "system", content: CHAT_SYSTEM_PROMPT },
       {
@@ -24,12 +27,14 @@ router.post("/chat", async (req, res) => {
       },
     ];
 
+    // Append any previous messages so the AI has conversation context
     if (conversationHistory && conversationHistory.length > 0) {
       for (const msg of conversationHistory) {
         messages.push({ role: msg.role, content: msg.content });
       }
     }
 
+    // Add the user's new message at the end
     messages.push({ role: "user", content: message });
 
     const reply = await chat(messages);
@@ -37,6 +42,16 @@ router.post("/chat", async (req, res) => {
     res.json({ reply });
   } catch (error) {
     console.error("Chat error:", error);
+
+    // Same rate limit handling as the analyze route
+    if (error.status === 429) {
+      return res.status(429).json({
+        error: "API rate limit reached. This app uses a free tier with limited requests.",
+        retryAfter: error.retryAfter || null,
+        resetTime: error.resetTime || null,
+      });
+    }
+
     res.status(500).json({ error: "Failed to get a response. Please try again." });
   }
 });

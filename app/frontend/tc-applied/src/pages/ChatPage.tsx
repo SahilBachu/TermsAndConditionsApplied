@@ -1,3 +1,5 @@
+// ChatPage - the AI chat interface where users can ask questions about their policy
+// Left side shows the simplified text + biases, right side is the chat
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { usePolicy } from "../context/PolicyContext";
@@ -8,21 +10,26 @@ import {
   type ChatMessage,
 } from "../data/mockData";
 
-const API_URL = "http://localhost:3001/api";
+// Same env-based API URL as PolicyContext
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001/api";
 
 export default function ChatPage() {
   const navigate = useNavigate();
   const { inputText, fullSimplifiedText, changeSummary, chatBiases } =
     usePolicy();
+
+  // Chat state - messages array and current input
   const [messages, setMessages] = useState<ChatMessage[]>([
     mockInitialChatMessage,
   ]);
   const [chatInput, setChatInput] = useState("");
   const [isSending, setIsSending] = useState(false);
 
+  // Sends the user's message to the /chat endpoint
   const handleSendMessage = async () => {
     if (chatInput.trim().length === 0 || isSending) return;
 
+    // Create the user message object and add it to the chat immediately
     const userMessage: ChatMessage = {
       id: `msg-${Date.now()}`,
       role: "user",
@@ -38,6 +45,7 @@ export default function ChatPage() {
     setIsSending(true);
 
     try {
+      // Build conversation history from previous messages (skip the initial greeting)
       const conversationHistory = messages
         .filter((m) => m.id !== "msg-1")
         .map((m) => ({ role: m.role, content: m.content }));
@@ -54,10 +62,21 @@ export default function ChatPage() {
 
       const data = await response.json();
 
+      // If rate limited, show the user when they can try again
+      let replyContent = data.reply || "Sorry, I could not process that. Please try again.";
+      if (response.status === 429) {
+        const retryMsg = data.retryAfter
+          ? `Please try again in ${data.retryAfter} seconds.`
+          : data.resetTime
+            ? `Limit resets in ${data.resetTime}.`
+            : "Please try again in a few minutes.";
+        replyContent = `API rate limit reached. ${retryMsg}`;
+      }
+
       const aiResponse: ChatMessage = {
         id: `msg-${Date.now() + 1}`,
         role: "assistant",
-        content: data.reply || "Sorry, I could not process that. Please try again.",
+        content: replyContent,
         timestamp: new Date().toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
@@ -66,6 +85,7 @@ export default function ChatPage() {
 
       setMessages((prev) => [...prev, aiResponse]);
     } catch {
+      // Network error or something unexpected
       const errorMessage: ChatMessage = {
         id: `msg-${Date.now() + 1}`,
         role: "assistant",
@@ -81,6 +101,7 @@ export default function ChatPage() {
     }
   };
 
+  // Clicking a suggested question fills the input with that question
   const handleSuggestedQuestion = (question: string) => {
     setChatInput(question);
   };

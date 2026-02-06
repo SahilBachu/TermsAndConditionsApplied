@@ -1,8 +1,12 @@
+// PolicyContext - global state for the app
+// Holds the policy text, simplified results, and handles the API call to analyze
 import { createContext, useContext, useState, type ReactNode } from "react";
 import { type SimplifiedSection, type Bias } from "../data/mockData";
 
-const API_URL = "http://localhost:3001/api";
+// Use VITE_API_URL from env if set (for production on Render), otherwise default to localhost for dev
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001/api";
 
+// Shape of everything the context provides to child components
 interface PolicyContextType {
   inputText: string;
   setInputText: (text: string) => void;
@@ -22,11 +26,13 @@ interface PolicyContextType {
 const PolicyContext = createContext<PolicyContextType | undefined>(undefined);
 
 export function PolicyProvider({ children }: { children: ReactNode }) {
+  // The raw policy text the user pastes in
   const [inputText, setInputText] = useState("");
   const [isSimplified, setIsSimplified] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // All the data we get back from the /analyze endpoint
   const [simplifiedSections, setSimplifiedSections] = useState<
     SimplifiedSection[]
   >([]);
@@ -36,6 +42,7 @@ export function PolicyProvider({ children }: { children: ReactNode }) {
   const [chatBiases, setChatBiases] = useState<Bias[]>([]);
   const [readabilityGrade, setReadabilityGrade] = useState("");
 
+  // Sends the policy to the backend for analysis
   const handleSimplify = async () => {
     setIsLoading(true);
     setError("");
@@ -47,6 +54,17 @@ export function PolicyProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({ policyText: inputText }),
       });
 
+      // Handle rate limiting - show the user when they can try again
+      if (response.status === 429) {
+        const errorData = await response.json();
+        const retryMsg = errorData.retryAfter
+          ? `Please try again in ${errorData.retryAfter} seconds.`
+          : errorData.resetTime
+            ? `Limit resets in ${errorData.resetTime}.`
+            : "Please try again in a few minutes.";
+        throw new Error(`API rate limit reached. ${retryMsg}`);
+      }
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to analyze policy.");
@@ -54,6 +72,7 @@ export function PolicyProvider({ children }: { children: ReactNode }) {
 
       const data = await response.json();
 
+      // Populate all the state with the response data
       setSimplifiedSections(data.simplifiedSections);
       setFullSimplifiedText(data.fullSimplifiedText);
       setChangeSummary(data.changeSummary);
@@ -72,6 +91,7 @@ export function PolicyProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Clears everything so the user can start fresh
   const handleReset = () => {
     setInputText("");
     setIsSimplified(false);
@@ -107,6 +127,7 @@ export function PolicyProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// Custom hook so we don't have to useContext(PolicyContext) everywhere
 export function usePolicy() {
   const context = useContext(PolicyContext);
   if (context === undefined) {

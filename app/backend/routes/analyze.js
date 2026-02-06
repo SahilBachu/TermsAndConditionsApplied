@@ -1,3 +1,5 @@
+// Analyze route - takes in a privacy policy and returns the simplified version
+// This is the main endpoint that does the heavy lifting
 const express = require("express");
 const router = express.Router();
 
@@ -5,6 +7,8 @@ const { chat } = require("../services/llm");
 const { getFleschKincaidGrade } = require("../services/readability");
 const { ANALYZE_SYSTEM_PROMPT } = require("../prompts/system");
 
+// Tailwind classes for the bias severity cards
+// These get sent to the frontend so the cards are styled correctly
 const SEVERITY_STYLES = {
   high: {
     borderColor: "border-red-100 dark:border-red-900/30",
@@ -23,6 +27,7 @@ const SEVERITY_STYLES = {
   },
 };
 
+// Attaches the right tailwind classes to each bias based on its severity
 function addSeverityStyles(biasArray) {
   return biasArray.map((bias) => ({
     ...bias,
@@ -39,22 +44,28 @@ router.post("/analyze", async (req, res) => {
       return res.status(400).json({ error: "Policy text is required." });
     }
 
+    // First pass - send the policy to the LLM with our system prompt
     const messages = [
       { role: "system", content: ANALYZE_SYSTEM_PROMPT },
       { role: "user", content: policyText },
     ];
 
     let rawResponse = await chat(messages);
+    // Sometimes the LLM wraps the JSON in code fences, so strip those out
     rawResponse = rawResponse.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
     let data = JSON.parse(rawResponse);
 
+    // Check if the simplified text is actually simple enough
     const allText = data.fullSimplifiedText.join(" ");
     let fkGrade = getFleschKincaidGrade(allText);
 
+    // If the grade is above 8, ask the LLM to try again (up to 2 retries)
+    // This is the feedback loop that ensures quality
     let retries = 0;
     while (fkGrade > 8 && retries < 2) {
       retries++;
 
+      // Send the previous response back so the LLM knows what to fix
       const retryMessages = [
         { role: "system", content: ANALYZE_SYSTEM_PROMPT },
         { role: "user", content: policyText },
@@ -73,6 +84,7 @@ router.post("/analyze", async (req, res) => {
       fkGrade = getFleschKincaidGrade(retryText);
     }
 
+    // Attach the styling info and readability grade before sending to frontend
     data.biases = addSeverityStyles(data.biases);
     data.chatBiases = addSeverityStyles(data.chatBiases);
     data.readabilityGrade = `Grade ${fkGrade.toFixed(1)}`;
@@ -80,6 +92,17 @@ router.post("/analyze", async (req, res) => {
     res.json(data);
   } catch (error) {
     console.error("Analyze error:", error);
+
+    // If it's a rate limit error, send back the retry info
+    // so the frontend can show the user when to try again
+    if (error.status === 429) {
+      return res.status(429).json({
+        error: "API rate limit reached. This app uses a free tier with limited requests.",
+        retryAfter: error.retryAfter || null,
+        resetTime: error.resetTime || null,
+      });
+    }
+
     res.status(500).json({ error: "Failed to analyze policy. Please try again." });
   }
 });

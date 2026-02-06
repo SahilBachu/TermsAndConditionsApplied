@@ -1,3 +1,5 @@
+// InputPage - the landing page where users paste their privacy policy
+// Has a sidebar with info about the tool and a textarea for the policy text
 import { useNavigate } from "react-router-dom";
 import { usePolicy } from "../context/PolicyContext";
 import DarkModeToggle from "../components/DarkModeToggle";
@@ -6,6 +8,7 @@ export default function InputPage() {
   const navigate = useNavigate();
   const { inputText, setInputText, handleSimplify, handleReset, isLoading, error } = usePolicy();
 
+  // Calls the analyze endpoint and navigates to results on success
   const onSimplify = async () => {
     if (inputText.trim().length === 0) return;
     const success = await handleSimplify();
@@ -23,11 +26,11 @@ export default function InputPage() {
   return (
     <div className="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark min-h-screen flex items-center justify-center p-4 selection:bg-primary selection:text-white transition-colors duration-300">
       <main className="w-full max-w-4xl bg-card-light dark:bg-card-dark rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden relative">
-        {/* Gradient accent bar */}
+        {/* Gradient accent bar at the top */}
         <div className="h-2 w-full bg-gradient-to-r from-blue-400 to-primary"></div>
 
         <div className="flex flex-col md:flex-row h-full">
-          {/* Sidebar */}
+          {/* Sidebar - project description and feature cards */}
           <aside className="w-full md:w-1/3 bg-gray-50 dark:bg-slate-800/50 p-8 border-r border-gray-100 dark:border-gray-700 flex flex-col justify-between">
             <div>
               <div className="flex items-center gap-3 mb-6">
@@ -98,7 +101,7 @@ export default function InputPage() {
             </div>
           </aside>
 
-          {/* Main content area */}
+          {/* Main content area - textarea and buttons */}
           <div className="w-full md:w-2/3 p-8 flex flex-col h-full">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -112,6 +115,7 @@ export default function InputPage() {
               </div>
             </div>
 
+            {/* Textarea with a clear button that appears on hover */}
             <div className="flex-grow relative group">
               <textarea
                 className="w-full h-80 md:h-96 p-4 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none resize-none transition-all text-sm leading-relaxed text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 shadow-inner"
@@ -130,12 +134,14 @@ export default function InputPage() {
               )}
             </div>
 
+            {/* Error message - shows rate limit info or general errors */}
             {error && (
               <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-sm text-red-600 dark:text-red-400">
                 {error}
               </div>
             )}
 
+            {/* Action buttons */}
             <div className="mt-6 flex items-center justify-between gap-4">
               <button
                 onClick={onReset}
@@ -178,7 +184,7 @@ export default function InputPage() {
         </div>
       </main>
 
-      {/* Background decorative elements */}
+      {/* Background decorative blurs */}
       <div className="fixed top-0 left-0 w-full h-full -z-10 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-400/10 rounded-full blur-[100px]"></div>
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-400/10 rounded-full blur-[100px]"></div>

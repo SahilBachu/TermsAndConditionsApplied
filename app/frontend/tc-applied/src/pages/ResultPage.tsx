@@ -1,3 +1,5 @@
+// ResultPage - displays the simplified policy, readability score, and detected biases
+// Users can navigate to the chat page from here to ask follow-up questions
 import { useNavigate } from "react-router-dom";
 import { usePolicy } from "../context/PolicyContext";
 import Navbar from "../components/Navbar";
@@ -14,7 +16,7 @@ export default function ResultPage() {
 
       <main className="flex-1 w-full max-w-4xl mx-auto p-6 md:p-12 flex flex-col items-center justify-start overflow-y-auto">
         <div className="w-full bg-white dark:bg-slate-800 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-black/30 border border-slate-100 dark:border-slate-700 relative overflow-hidden transition-all duration-300">
-          {/* Header */}
+          {/* Header with readability badge */}
           <div className="px-6 py-5 md:px-8 md:py-6 border-b border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <div className="h-12 w-12 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400 shrink-0">
@@ -37,7 +39,7 @@ export default function ResultPage() {
               </div>
             </div>
 
-            {/* Readability badge */}
+            {/* Shows the Flesch-Kincaid grade we achieved */}
             <div className="flex items-center self-start md:self-center gap-3 px-4 py-2 bg-emerald-50 dark:bg-emerald-900/10 text-emerald-700 dark:text-emerald-400 rounded-lg border border-emerald-100 dark:border-emerald-900/20">
               <div className="flex flex-col items-end">
                 <span className="text-[10px] uppercase font-bold tracking-wider opacity-70">
@@ -51,7 +53,7 @@ export default function ResultPage() {
             </div>
           </div>
 
-          {/* Simplified content */}
+          {/* Simplified sections - each semantic node gets its own section */}
           <div className="p-6 md:p-10 space-y-6">
             <p className="text-lg text-slate-700 dark:text-slate-200 leading-relaxed font-medium">
               Here is the simplified version of the document you uploaded.
@@ -73,7 +75,7 @@ export default function ResultPage() {
             </div>
           </div>
 
-          {/* Full Simplified Policy */}
+          {/* Full simplified policy - the entire thing rewritten in plain English */}
           {fullSimplifiedText.length > 0 && (
             <div className="border-t border-slate-100 dark:border-slate-700 p-6 md:p-10 space-y-4">
               <div className="flex items-center gap-3 mb-4">
@@ -105,7 +107,7 @@ export default function ResultPage() {
             </div>
           )}
 
-          {/* Critical Biases section */}
+          {/* Bias cards - shows all the unfair clauses the AI found */}
           {biases.length > 0 && (
             <div className="bg-red-50/50 dark:bg-red-900/10 border-t border-red-100 dark:border-red-900/30 p-6 md:p-8">
               <div className="flex items-center justify-between mb-6">
@@ -132,7 +134,7 @@ export default function ResultPage() {
             </div>
           )}
 
-          {/* Floating chat button */}
+          {/* Floating button to open the AI chat */}
           <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8 z-10">
             <button
               onClick={() => navigate("/chat")}
