@@ -5,13 +5,14 @@ import BiasCard from "../components/BiasCard";
 
 export default function ResultPage() {
   const navigate = useNavigate();
-  const { simplifiedSections, biases, readabilityGrade } = usePolicy();
+  const { simplifiedSections, fullSimplifiedText, biases, readabilityGrade } =
+    usePolicy();
 
   return (
     <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col transition-colors duration-300">
       <Navbar />
 
-      <main className="flex-1 w-full max-w-4xl mx-auto p-6 md:p-12 flex flex-col items-center justify-start">
+      <main className="flex-1 w-full max-w-4xl mx-auto p-6 md:p-12 flex flex-col items-center justify-start overflow-y-auto">
         <div className="w-full bg-white dark:bg-slate-800 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-black/30 border border-slate-100 dark:border-slate-700 relative overflow-hidden transition-all duration-300">
           {/* Header */}
           <div className="px-6 py-5 md:px-8 md:py-6 border-b border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -30,7 +31,7 @@ export default function ResultPage() {
                     description
                   </span>
                   <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                    Privacy_Policy_Analysis.docx
+                    File
                   </span>
                 </div>
               </div>
@@ -58,7 +59,7 @@ export default function ResultPage() {
               rights and obligations quickly.
             </p>
 
-            <div className="space-y-6 pl-4 border-l-2 border-slate-200 dark:border-slate-700">
+            <div className="space-y-6 pl-4 border-l-2 border-slate-200 dark:border-slate-700 max-h-[400px] overflow-y-auto pr-2">
               {simplifiedSections.map((section, index) => (
                 <div key={index} className="relative">
                   <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2">
@@ -71,6 +72,38 @@ export default function ResultPage() {
               ))}
             </div>
           </div>
+
+          {/* Full Simplified Policy */}
+          {fullSimplifiedText.length > 0 && (
+            <div className="border-t border-slate-100 dark:border-slate-700 p-6 md:p-10 space-y-4">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+                  <span className="material-icons-round text-xl">
+                    text_snippet
+                  </span>
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 tracking-tight">
+                    Full Simplified Policy
+                  </h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    The entire policy rewritten in plain English
+                  </p>
+                </div>
+              </div>
+
+              <div className="max-h-[500px] overflow-y-auto pr-2 space-y-4 pl-4 border-l-2 border-blue-200 dark:border-blue-800">
+                {fullSimplifiedText.map((paragraph, index) => (
+                  <p
+                    key={index}
+                    className="text-slate-600 dark:text-slate-300 leading-relaxed"
+                  >
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Critical Biases section */}
           {biases.length > 0 && (

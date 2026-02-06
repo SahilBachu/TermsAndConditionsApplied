@@ -1,14 +1,15 @@
 import { useNavigate } from "react-router-dom";
 import { usePolicy } from "../context/PolicyContext";
+import DarkModeToggle from "../components/DarkModeToggle";
 
 export default function InputPage() {
   const navigate = useNavigate();
-  const { inputText, setInputText, handleSimplify, handleReset } = usePolicy();
+  const { inputText, setInputText, handleSimplify, handleReset, isLoading, error } = usePolicy();
 
-  const onSimplify = () => {
+  const onSimplify = async () => {
     if (inputText.trim().length === 0) return;
-    handleSimplify();
-    navigate("/result");
+    const success = await handleSimplify();
+    if (success) navigate("/result");
   };
 
   const onReset = () => {
@@ -50,19 +51,20 @@ export default function InputPage() {
                   </p>
                 </div>
 
-                {/* Feature card: Bias Detection */}
+                {/* Feature card: Ontology-Based Extraction */}
                 <div className="p-4 bg-white dark:bg-slate-700 rounded-xl border border-gray-100 dark:border-gray-600 shadow-sm">
                   <div className="flex items-start gap-3">
                     <span className="material-icons-round text-primary mt-0.5">
-                      psychology
+                      account_tree
                     </span>
                     <div>
                       <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                        Bias Detection
+                        Ontology-Based Extraction
                       </h3>
                       <p className="text-xs text-subtext-light dark:text-subtext-dark mt-1">
-                        We highlight framing effects and self-enhancement biases
-                        automatically.
+                        Built on the methodology of Kaur et al. (2022), we map
+                        policies to semantic nodes like data collection, sharing,
+                        retention, and user rights.
                       </p>
                     </div>
                   </div>
@@ -102,9 +104,12 @@ export default function InputPage() {
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Input Policy Text
               </h2>
-              <span className="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-primary text-xs font-medium rounded-full">
-                Beta v1.0
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-primary text-xs font-medium rounded-full">
+                  Beta v1.0
+                </span>
+                <DarkModeToggle />
+              </div>
             </div>
 
             <div className="flex-grow relative group">
@@ -125,6 +130,12 @@ export default function InputPage() {
               )}
             </div>
 
+            {error && (
+              <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-sm text-red-600 dark:text-red-400">
+                {error}
+              </div>
+            )}
+
             <div className="mt-6 flex items-center justify-between gap-4">
               <button
                 onClick={onReset}
@@ -142,13 +153,24 @@ export default function InputPage() {
                 </div>
                 <button
                   onClick={onSimplify}
-                  disabled={inputText.trim().length === 0}
+                  disabled={inputText.trim().length === 0 || isLoading}
                   className="flex items-center gap-2 px-8 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl text-sm font-medium shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
                 >
-                  <span className="material-icons-round text-lg">
-                    auto_fix_high
-                  </span>
-                  Simplify
+                  {isLoading ? (
+                    <>
+                      <span className="material-icons-round text-lg animate-spin">
+                        hourglass_empty
+                      </span>
+                      Analyzing...
+                    </>
+                  ) : (
+                    <>
+                      <span className="material-icons-round text-lg">
+                        auto_fix_high
+                      </span>
+                      Simplify
+                    </>
+                  )}
                 </button>
               </div>
             </div>

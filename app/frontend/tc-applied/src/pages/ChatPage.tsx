@@ -8,16 +8,20 @@ import {
   type ChatMessage,
 } from "../data/mockData";
 
+const API_URL = "http://localhost:3001/api";
+
 export default function ChatPage() {
   const navigate = useNavigate();
-  const { fullSimplifiedText, changeSummary, chatBiases } = usePolicy();
+  const { inputText, fullSimplifiedText, changeSummary, chatBiases } =
+    usePolicy();
   const [messages, setMessages] = useState<ChatMessage[]>([
     mockInitialChatMessage,
   ]);
   const [chatInput, setChatInput] = useState("");
+  const [isSending, setIsSending] = useState(false);
 
-  const handleSendMessage = () => {
-    if (chatInput.trim().length === 0) return;
+  const handleSendMessage = async () => {
+    if (chatInput.trim().length === 0 || isSending) return;
 
     const userMessage: ChatMessage = {
       id: `msg-${Date.now()}`,
@@ -29,19 +33,52 @@ export default function ChatPage() {
       }),
     };
 
-    const aiResponse: ChatMessage = {
-      id: `msg-${Date.now() + 1}`,
-      role: "assistant",
-      content:
-        "Thanks for your question! In a production version, this would be answered by our AI model using the context of the analyzed policy. For now, this is a placeholder response.",
-      timestamp: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
-
-    setMessages((prev) => [...prev, userMessage, aiResponse]);
+    setMessages((prev) => [...prev, userMessage]);
     setChatInput("");
+    setIsSending(true);
+
+    try {
+      const conversationHistory = messages
+        .filter((m) => m.id !== "msg-1")
+        .map((m) => ({ role: m.role, content: m.content }));
+
+      const response = await fetch(`${API_URL}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: chatInput,
+          policyText: inputText,
+          conversationHistory,
+        }),
+      });
+
+      const data = await response.json();
+
+      const aiResponse: ChatMessage = {
+        id: `msg-${Date.now() + 1}`,
+        role: "assistant",
+        content: data.reply || "Sorry, I could not process that. Please try again.",
+        timestamp: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      };
+
+      setMessages((prev) => [...prev, aiResponse]);
+    } catch {
+      const errorMessage: ChatMessage = {
+        id: `msg-${Date.now() + 1}`,
+        role: "assistant",
+        content: "Sorry, something went wrong. Please try again.",
+        timestamp: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const handleSuggestedQuestion = (question: string) => {
@@ -73,11 +110,6 @@ export default function ChatPage() {
             </button>
             <div className="flex gap-4 items-center">
               <DarkModeToggle />
-              <div className="w-8 h-8 bg-gray-300 dark:bg-gray-700 rounded-full overflow-hidden flex items-center justify-center">
-                <span className="material-icons-round text-gray-400 dark:text-gray-500 text-sm">
-                  person
-                </span>
-              </div>
             </div>
           </header>
 
@@ -255,9 +287,12 @@ export default function ChatPage() {
               />
               <button
                 onClick={handleSendMessage}
-                className="absolute right-2 p-2 bg-primary hover:bg-primary-dark text-white rounded-xl shadow-lg shadow-blue-500/30 transition-all hover:scale-105 active:scale-95 flex items-center justify-center"
+                disabled={isSending}
+                className="absolute right-2 p-2 bg-primary hover:bg-primary-dark text-white rounded-xl shadow-lg shadow-blue-500/30 transition-all hover:scale-105 active:scale-95 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span className="material-icons-round text-sm">send</span>
+                <span className={`material-icons-round text-sm ${isSending ? "animate-spin" : ""}`}>
+                  {isSending ? "hourglass_empty" : "send"}
+                </span>
               </button>
             </div>
             <div className="mt-3 text-center">

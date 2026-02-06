@@ -1,4 +1,4 @@
-const rs = require("text-readability");
+const rs = require("text-readability").default;
 
 function getFleschKincaidGrade(text) {
   return rs.fleschKincaidGrade(text);

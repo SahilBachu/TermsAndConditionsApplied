@@ -19,11 +19,6 @@ export default function Navbar() {
       </button>
       <div className="flex items-center gap-4">
         <DarkModeToggle />
-        <div className="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden border border-slate-300 dark:border-slate-600 flex items-center justify-center">
-          <span className="material-icons-round text-slate-400 dark:text-slate-500 text-sm">
-            person
-          </span>
-        </div>
       </div>
     </nav>
   );

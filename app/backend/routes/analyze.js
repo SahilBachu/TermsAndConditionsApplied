@@ -45,7 +45,7 @@ router.post("/analyze", async (req, res) => {
     ];
 
     let rawResponse = await chat(messages);
-    rawResponse = rawResponse.replace(/\s*/g, "").replace(/```\s*/g, "").trim();
+    rawResponse = rawResponse.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
     let data = JSON.parse(rawResponse);
 
     const allText = data.fullSimplifiedText.join(" ");
@@ -66,7 +66,7 @@ router.post("/analyze", async (req, res) => {
       ];
 
       rawResponse = await chat(retryMessages);
-      rawResponse = rawResponse.replace(/\s*/g, "").replace(/```\s*/g, "").trim();
+      rawResponse = rawResponse.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
       data = JSON.parse(rawResponse);
 
       const retryText = data.fullSimplifiedText.join(" ");
